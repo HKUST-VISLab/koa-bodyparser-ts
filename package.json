@@ -8,7 +8,7 @@
     "clean": "node tools/build clean",
     "build": "npm run clean && tsc -p . && node tools/build move",
     "test": "npm run build && nyc ava",
-    "release": "standard-version"
+    "release": "standard-version && git push --follow-tags origin master"
   },
   "engines": {
     "node": ">=6.0"
