@@ -1,7 +1,7 @@
 import test from "ava";
 import * as Koa from "koa";
 import * as request from "supertest";
-import bodyparser, { BodyParserOptions } from "./index";
+import bodyparser, { BodyParserOptions } from "../src/index";
 
 const rawJson = `{"_id":"mk2testmodule","name":"mk2testmodule","description":"","dist-tags":{"latest
 ":"0.0.1"},"versions":{"0.0.1":{"name":"mk2testmodule","version":"0.0.1","description":"","main":"in

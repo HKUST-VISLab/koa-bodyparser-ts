@@ -9,14 +9,10 @@
         "noUnusedLocals": true,
         "experimentalDecorators": true,
         "declaration": true,
-        "rootDirs": [
-            "src",
-            "test"
-        ],
-        "sourceRoot": "."
+        "rootDir": "."
     },
     "include": [
         "src/**/*.ts",
-        "test/**/*.spec.ts"
+        "test/**/*.ts"
     ]
 }
