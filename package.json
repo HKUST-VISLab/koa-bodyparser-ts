@@ -1,13 +1,14 @@
 {
   "name": "koa-bodyparser-ts",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "a bodyparser for koa written in TypeScript.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "node tools/build clean",
     "build": "npm run clean && tsc -p . && node tools/build move",
-    "test": "npm build && nyc ava"
+    "test": "npm run build && nyc ava",
+    "release": "standard-version"
   },
   "engines": {
     "node": ">=6.0"
@@ -37,6 +38,7 @@
     "koa": "^2.2.0",
     "nyc": "^10.3.2",
     "shelljs": "^0.7.7",
+    "standard-version": "^4.0.0",
     "supertest": "^3.0.0",
     "typescript": "^2.3.2"
   },
