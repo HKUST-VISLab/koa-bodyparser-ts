@@ -1,0 +1,68 @@
+{
+  "name": "koa-bodyparser-ts",
+  "version": "0.0.1",
+  "description": "a bodyparser for koa written in TypeScript.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "node tools/build clean",
+    "build": "npm run clean && tsc -p . && node tools/build move",
+    "test": "nyc ava",
+    "coverage": "nyc report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HKUST-VISLab/koa-bodyparser-ts.git"
+  },
+  "keywords": [
+    "koa",
+    "bodyparser",
+    "typescript"
+  ],
+  "author": "chenzhutian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HKUST-VISLab/koa-bodyparser-ts/issues"
+  },
+  "homepage": "https://github.com/HKUST-VISLab/koa-bodyparser-ts#readme",
+  "dependencies": {
+    "@types/koa": "^2.0.39",
+    "co-body": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/supertest": "^2.0.0",
+    "ava": "^0.19.1",
+    "koa": "^2.2.0",
+    "nyc": "^10.3.2",
+    "shelljs": "^0.7.7",
+    "supertest": "^3.0.0",
+    "typescript": "^2.3.2"
+  },
+  "peerDependencies": {
+    "koa": "2.2.0"
+  },
+  "ava": {
+    "files": [
+      "dist/**/*.spec.js"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "dist/**/*.js"
+    ],
+    "exclude": [
+      "dist/**/*.spec.js"
+    ],
+    "extensions": [
+      ".ts"
+    ],
+    "sourceMap": true,
+    "reporter":[
+      "lcov",
+      "text"
+    ],
+    "cache": true,
+    "all": true,
+    "check-coverage": false
+  }
+}
