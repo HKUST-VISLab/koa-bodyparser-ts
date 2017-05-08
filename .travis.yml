@@ -1,0 +1,27 @@
+sudo: required
+language: node_js
+node_js:
+  - "6"
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+  webhooks:
+    on_success: change  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: never     # options: [always|never|change] default: always
+
+before_script:
+  - npm install
+script:
+  - npm run test
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  provider: npm
+  email: $ZHUTIAN_EMAIL
+  api_key: $ZHUTIAN_NPM_KEY
+  on:
+    tags: true

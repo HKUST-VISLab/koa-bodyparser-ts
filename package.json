@@ -7,8 +7,10 @@
   "scripts": {
     "clean": "node tools/build clean",
     "build": "npm run clean && tsc -p . && node tools/build move",
-    "test": "nyc ava",
-    "coverage": "nyc report"
+    "test": "npm build && nyc ava"
+  },
+  "engines": {
+    "node": ">=6.0"
   },
   "repository": {
     "type": "git",
