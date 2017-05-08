@@ -5,3 +5,9 @@ dist/*.spec.*
 coverage
 .nyc_output
 .vscode
+tslint.json
+tsconfig.json
+.travis.yml
+.npmignore
+tools
+test

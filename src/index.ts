@@ -57,13 +57,6 @@ function extendType(original, extend) {
     return original;
 }
 
-/**
- * 
- * 
- * @export
- * @param {BodyParserOptions} [opts={}] 
- * @returns 
- */
 export default function bodyParser(opts: BodyParserOptions = {}) {
     const { detectJSON, onerror } = opts;
 
