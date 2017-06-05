@@ -29,10 +29,10 @@
   },
   "homepage": "https://github.com/HKUST-VISLab/koa-bodyparser-ts#readme",
   "dependencies": {
-    "co-body": "^5.1.1"
+    "co-body": "^5.1.1",
+    "@types/koa": "^2.0.39"
   },
   "devDependencies": {
-    "@types/koa": "^2.0.39",
     "@types/supertest": "^2.0.0",
     "ava": "^0.19.1",
     "koa": "^2.2.0",
