@@ -12,7 +12,8 @@ declare module "koa" {
 }
 
 /**
- * @param [Object] opts
+ *  The options 
+ * 
  *   - {String[]} parser will only parse when request type hits enableTypes, default is ['json', 'form'].
  *   - {string} encoding default 'utf-8'
  *   - {String} formLimit default '56kb'
@@ -25,6 +26,8 @@ declare module "koa" {
  *   - {Object} extendTypes support extend types
  *   - {Function} onerror support custom error handle, if koa-bodyparser throw an error, you can customize
  *       the response.
+ * @export
+ * @interface BodyParserOptions
  */
 export interface BodyParserOptions {
     enableTypes?: string[];
