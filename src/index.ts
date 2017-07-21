@@ -45,12 +45,26 @@ export interface BodyParserOptions {
     onerror?: (err: Error, ctx: Context) => void;
 }
 
-function formatOptions(opts, type) {
+/**
+ * 
+ * 
+ * @param {BodyParserOptions} opts 
+ * @param {string} type 
+ * @returns 
+ */
+function formatOptions(opts: BodyParserOptions, type: string) {
     const res = Object.assign({}, opts, { limit: opts[type + "Limit"] });
     return res;
 }
 
-function extendType(original, extend) {
+/**
+ * 
+ * 
+ * @param {string[]} original 
+ * @param {(string[] | string)} extend 
+ * @returns 
+ */
+function extendType(original: string[], extend: string[] | string) {
     if (extend) {
         if (!Array.isArray(extend)) {
             extend = [extend];
