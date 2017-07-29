@@ -23,5 +23,6 @@ deploy:
   provider: npm
   email: $ZHUTIAN_EMAIL
   api_key: $ZHUTIAN_NPM_KEY
+  skip_cleanup: true
   on:
     tags: true
