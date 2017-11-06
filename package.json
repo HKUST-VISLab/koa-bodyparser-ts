@@ -34,15 +34,15 @@
     "@types/koa": "^2.0.39"
   },
   "devDependencies": {
-    "@types/supertest": "^2.0.2",
-    "ava": "^0.22.0",
+    "@types/supertest": "^2.0.3",
+    "ava": "^0.23.0",
     "koa": "^2.3.0",
-    "nyc": "^11.0.3",
+    "nyc": "^11.3.0",
     "shelljs": "^0.7.8",
     "standard-version": "^4.2.0",
     "supertest": "^3.0.0",
-    "tslint": "^5.5.0",
-    "typescript": "^2.4.2"
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.1"
   },
   "peerDependencies": {
     "koa": "^2.3.0"
