@@ -45,7 +45,7 @@
     "typescript": "^2.6.2"
   },
   "peerDependencies": {
-    "koa": "^2.3.0"
+    "koa": "^2.4.1"
   },
   "ava": {
     "files": [
