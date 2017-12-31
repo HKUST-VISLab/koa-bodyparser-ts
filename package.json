@@ -34,11 +34,7 @@
     "@types/koa": "^2.0.43"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@types/supertest": "^2.0.4",
-=======
-    "@types/supertest": "^2.0.3",
->>>>>>> e6473f5fd6f57d5729f9ffe3fdae52af64896be9
     "ava": "^0.24.0",
     "koa": "^2.4.1",
     "nyc": "^11.4.1",
