@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.1.6...v0.2.0) (2018-05-12)
+
+
+### Bug Fixes
+
+* **package:** update [@types](https://github.com/types)/node to version 9.6.3 ([b156eae](https://github.com/HKUST-VISLab/koa-bodyparser-ts/commit/b156eae))
+
+
+### Features
+
+* support upload files ([1ddce10](https://github.com/HKUST-VISLab/koa-bodyparser-ts/commit/1ddce10))
+
+
+
 <a name="0.1.6"></a>
 ## [0.1.6](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.1.5...v0.1.6) (2018-04-10)
 
