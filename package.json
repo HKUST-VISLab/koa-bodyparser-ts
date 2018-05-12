@@ -32,7 +32,8 @@
   "dependencies": {
     "@types/koa": "^2.0.45",
     "@types/node": "^9.6.3",
-    "co-body": "^5.1.1"
+    "co-body": "^5.1.1",
+    "formidable": "^1.2.1"
   },
   "devDependencies": {
     "@types/supertest": "^2.0.4",

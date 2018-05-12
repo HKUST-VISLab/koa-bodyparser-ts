@@ -1,4 +1,5 @@
 import * as parse from "co-body";
+import * as forms from "formidable";
 import { Context } from "koa";
 
 declare module "koa" {
@@ -12,13 +13,43 @@ declare module "koa" {
 }
 
 /**
- *  The options 
- * 
- *   - {String[]} parser will only parse when request type hits enableTypes, default is ['json', 'form'].
- *   - {string} encoding default 'utf-8'
- *   - {String} formLimit default '56kb'
- *   - {String} jsonLimit default '1mb'
- *   - {String} textLimit default '1mb'
+ *  The options
+ *
+ *   - {number} bytesExpected, The expected number of bytes in this form, default `null`
+ *   - {number} maxFields, Limits the number of fields that the querystring parser will decode, default `1000`
+ *   - {number} maxFieldsSize, Limits the amount of memory all fields together (except files) can allocate in bytes.
+ *              If this value is exceeded, an 'error' event is emitted, default `2mb (2 * 1024 * 1024)`
+ *   - {String} uploadDir, Sets the directory for placing file uploads in, default `os.tmpDir()`
+ *   - {Boolean} keepExtensions, Files written to `uploadDir` will include the extensions of the original files,
+ *               default `false`
+ *   - {String} hash, If you want checksums calculated for incoming files, set this to either `'sha1'` or `'md5'`,
+ *              default `false`
+ *   - {Boolean} multiples, Multiple file uploads or no, default `true`
+ *   - {Function} onFileBegin, Special callback on file begin. The function is executed directly by formidable.
+ *                It can be used to rename files before saving them to disk.
+ *                [See the docs](https://github.com/felixge/node-formidable#filebegin)
+ * @export
+ * @interface MultiPartOptions
+ */
+export interface MultiPartOptions {
+    bytesExpected: number;
+    maxFields: number;
+    maxFieldsSize: number;
+    uploadDir: string;
+    keepExtensions: boolean;
+    hash: string;
+    multiples: boolean;
+    onFileBegin: (name: string, file: object) => void;
+}
+
+/**
+ *  The options
+ *
+ *   - {String[]} enableTypes, parser will only parse when request type hits enableTypes, default is ['json', 'form'].
+ *   - {String} encode, default 'utf-8'
+ *   - {String} formLimit, default '56kb'
+ *   - {String} jsonLimit, default '1mb'
+ *   - {String} textLimit, default '1mb'
  *   - {String} strict when set to true, JSON parser will only accept arrays and objects. Default is
  *       true. See strict mode in co-body. In strict mode, ctx.request.body will always be an
  *       object(or array), this avoid lots of type judging. But text body will always return string type.
@@ -35,22 +66,24 @@ export interface BodyParserOptions {
     formLimit?: string | number;
     jsonLimit?: string | number;
     textLimit?: string | number;
+    multipartOptions?: object;
     strict?: boolean;
     detectJSON?: (ctx: Context) => boolean;
     extendTypes?: {
         json?: string | string[];
         form?: string | string[];
         text?: string | string[];
+        multipart?: string | string[];
     };
     onerror?: (err: Error, ctx: Context) => void;
 }
 
 /**
- * 
- * 
- * @param {BodyParserOptions} opts 
- * @param {string} type 
- * @returns 
+ *
+ *
+ * @param {BodyParserOptions} opts
+ * @param {string} type
+ * @returns
  */
 function formatOptions(opts: BodyParserOptions, type: string) {
     const res = Object.assign({}, opts, { limit: opts[type + "Limit"] });
@@ -58,29 +91,57 @@ function formatOptions(opts: BodyParserOptions, type: string) {
 }
 
 /**
- * 
- * 
- * @param {string[]} original 
- * @param {(string[] | string)} extend 
- * @returns 
+ * Donable formidable
+ *
+ * @param  {Stream} ctx
+ * @param  {Object} opts
+ * @return {Object}
+ * @api private
  */
-function extendType(original: string[], extend: string[] | string) {
-    if (extend) {
-        if (!Array.isArray(extend)) {
-            extend = [extend];
+async function formy(ctx, opts) {
+    return new Promise((resolve, reject) => {
+        const fields = {};
+        const files = {};
+        const form = new forms.IncomingForm(opts);
+        form.on("end", () => resolve({ fields, files }))
+            .on("error", (err) => reject(err))
+            .on("field", (field, value) => {
+                if (fields[field]) {
+                    if (Array.isArray(fields[field])) {
+                        fields[field].push(value);
+                    } else {
+                        fields[field] = [fields[field], value];
+                    }
+                } else {
+                    fields[field] = value;
+                }
+            })
+            .on("file", (field, file) => {
+                if (files[field]) {
+                    if (Array.isArray(files[field])) {
+                        files[field].push(file);
+                    } else {
+                        files[field] = [files[field], file];
+                    }
+                } else {
+                    files[field] = file;
+                }
+            });
+        if (opts.onFileBegin) {
+            form.on("fileBegin", opts.onFileBegin);
         }
-        return original.concat(extend);
-    }
-    return original;
+        form.parse(ctx.req);
+    });
 }
 
 export default function bodyParser(opts: BodyParserOptions = {}) {
-    const { detectJSON, onerror } = opts;
+    const { detectJSON, onerror, multipartOptions = {} } = opts;
 
     const enableTypes = (opts.enableTypes && new Set(opts.enableTypes)) || new Set(["json", "form"]);
     const enableForm = enableTypes.has("form"); // checkEnable(enableTypes, "form");
     const enableJson = enableTypes.has("json"); // checkEnable(enableTypes, "json");
     const enableText = enableTypes.has("text"); // checkEnable(enableTypes, "text");
+    const enableMultipart = enableTypes.has("multipart");
 
     opts.detectJSON = undefined;
     opts.onerror = undefined;
@@ -88,25 +149,34 @@ export default function bodyParser(opts: BodyParserOptions = {}) {
     const jsonOpts = formatOptions(opts, "json");
     const formOpts = formatOptions(opts, "form");
     const textOpts = formatOptions(opts, "text");
+    const multipartOpts = multipartOptions;
 
-    const extendTypes = opts.extendTypes || { json: null, form: null, text: null };
+    const extendTypes = opts.extendTypes || { json: [], form: [], text: [], multipart: [] };
 
-    const jsonTypes = extendType([
+    const jsonTypes = [
         "application/json",
         "application/json-patch+json",
         "application/vnd.api+json",
         "application/csp-report",
-    ], extendTypes.json);
+        ...Array.isArray(extendTypes.json) ? extendTypes.json : [extendTypes.json],
+    ];
 
-    const formTypes = extendType([
+    const formTypes = [
         "application/x-www-form-urlencoded",
-    ], extendTypes.form);
+        ...Array.isArray(extendTypes.form) ? extendTypes.form : [extendTypes.form],
+    ];
 
-    const textTypes = extendType([
+    const textTypes = [
         "text/plain",
-    ], extendTypes.text);
+        ...Array.isArray(extendTypes.text) ? extendTypes.text : [extendTypes.text],
+    ];
 
-    return async function bodyParser(ctx: Context, next) {
+    const multipartTypes = [
+        "multipart/form-data",
+        ...Array.isArray(extendTypes.multipart) ? extendTypes.multipart : [extendTypes.multipart],
+    ];
+
+    return async (ctx: Context, next) => {
         if (ctx.request.body !== undefined) {
             return await next();
         }
@@ -115,7 +185,7 @@ export default function bodyParser(opts: BodyParserOptions = {}) {
         }
         try {
             const res = await parseBody(ctx);
-            ctx.request.body = "parsed" in res ? res.parsed : {};
+            ctx.request.body = "parsed" in res ? res.parsed : res;
             ctx.request.rawBody = res.raw;
         } catch (err) {
             if (onerror) {
@@ -131,11 +201,14 @@ export default function bodyParser(opts: BodyParserOptions = {}) {
         if (enableJson && ((detectJSON && detectJSON(ctx)) || ctx.request.is(jsonTypes))) {
             return await parse.json(ctx, jsonOpts);
         }
-        if (enableForm && ctx.request.is(formTypes)) {
+        if (enableForm && ctx.is(formTypes)) {
             return await parse.form(ctx, formOpts);
         }
-        if (enableText && ctx.request.is(textTypes)) {
+        if (enableText && ctx.is(textTypes)) {
             return await parse.text(ctx, textOpts);
+        }
+        if (enableMultipart && ctx.is(multipartTypes)) {
+            return await formy(ctx, multipartOpts);
         }
         return {};
     }
