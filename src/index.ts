@@ -66,7 +66,7 @@ export interface BodyParserOptions {
     formLimit?: string | number;
     jsonLimit?: string | number;
     textLimit?: string | number;
-    multipartOptions?: object;
+    multipartOptions?: MultiPartOptions;
     strict?: boolean;
     detectJSON?: (ctx: Context) => boolean;
     extendTypes?: {
