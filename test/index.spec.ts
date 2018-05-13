@@ -319,7 +319,8 @@ test("bodyparser#multipart FILES", async (t) => {
 
     t.truthy(Array.isArray(res.body.files.secondField) && res.body.files.secondField.length === 2,
         "res.body.files.secondField should be an array of length 2");
-    t.deepEqual(res.body.files.secondField.map(d => d.name), ["package.json", "index.ts"],
+    t.truthy(res.body.files.secondField.map(d => d.name)
+        .every(d => ["package.json", "index.ts"].indexOf(d) !== -1),
         "the name of files in files.secondField");
     t.truthy(statSync(res.body.files.secondField[0].path), "the file state of secondField[0] should be ok");
     t.truthy(statSync(res.body.files.secondField[1].path), "the file state of secondField[1] should be ok");
