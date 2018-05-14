@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.4"></a>
+## [0.2.4](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.2.3...v0.2.4) (2018-05-14)
+
+
+### Bug Fixes
+
+* type problem ([91b5387](https://github.com/HKUST-VISLab/koa-bodyparser-ts/commit/91b5387))
+
+
+
 <a name="0.2.3"></a>
 ## [0.2.3](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.2.2...v0.2.3) (2018-05-13)
 
