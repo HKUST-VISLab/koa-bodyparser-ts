@@ -32,14 +32,14 @@ declare module "koa" {
  * @interface MultiPartOptions
  */
 export interface MultiPartOptions {
-    bytesExpected: number;
-    maxFields: number;
-    maxFieldsSize: number;
-    uploadDir: string;
-    keepExtensions: boolean;
-    hash: string;
-    multiples: boolean;
-    onFileBegin: (name: string, file: object) => void;
+    bytesExpected?: number;
+    maxFields?: number;
+    maxFieldsSize?: number;
+    uploadDir?: string;
+    keepExtensions?: boolean;
+    hash?: "sha1" | "md5";
+    multiples?: boolean;
+    onFileBegin?: (name: string, file: { name: string; path: string; }) => void;
 }
 
 /**
