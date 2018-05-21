@@ -32,7 +32,7 @@
   "dependencies": {
     "@types/koa": "^2.0.45",
     "@types/node": "^9.6.3",
-    "co-body": "^5.1.1",
+    "co-body": "^6.0.0",
     "formidable": "^1.2.1"
   },
   "devDependencies": {
