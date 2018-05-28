@@ -208,12 +208,12 @@ export default function bodyParser(opts: BodyParserOptions = {}) {
             return await parse.text(ctx, textOpts);
         }
         if (enableMultipart && ctx.is(multipartTypes)) {
-            if (typeof multipartOptions.uploadDir === "string") {
-                return await formy(ctx, multipartOpts);
-            } else if (typeof multipartOptions.uploadDir === "object") {
+            if (typeof multipartOptions.uploadDir === "object") {
                 const newOpts = { ...multipartOptions };
                 newOpts.uploadDir = multipartOptions.uploadDir[ctx.path];
                 return await formy(ctx, newOpts);
+            } else {
+                return await formy(ctx, multipartOpts);
             }
         }
         return {};
