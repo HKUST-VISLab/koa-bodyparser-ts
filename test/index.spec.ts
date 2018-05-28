@@ -368,3 +368,47 @@ test("bodyparser#multipart transfer file names", async (t) => {
     t.truthy(statSync(res.body.files.firstField.path), "the file state of firstField should be ok");
     unlinkSync(res.body.files.firstField.path);
 });
+
+test("bodyparser#multipart auto open box based on ctx.path if uploadPath is an object", async (t) => {
+    const app = makeApp({
+        enableTypes: ["multipart"],
+        multipartOptions: {
+            uploadDir: {
+                "/user": `${__dirname}`,
+                "/": path.resolve(__dirname, ".."),
+            },
+            onFileBegin: (name, file) => {
+                file.name = "backage.json";
+                const folder = path.dirname(file.path);
+                file.path = path.join(folder, file.name);
+            },
+        },
+    });
+    app.use(async (ctx) => {
+        ctx.body = ctx.request.body;
+    });
+
+    const req = request(app.listen());
+    let res = await req.post("/user")
+        .type("multipart/form-data")
+        .field("names", "John")
+        .field("names", "Paul")
+        .attach("firstField", "package.json");
+
+    t.truthy(typeof res.body.files.firstField === "object", "the res.body.files.firstField should be an object");
+    t.deepEqual(res.body.files.firstField.name, "backage.json", "the file name should be transfered");
+    t.truthy(statSync(res.body.files.firstField.path), "the file state of firstField should be ok");
+    unlinkSync(res.body.files.firstField.path);
+
+    res = await req.post("/")
+        .type("multipart/form-data")
+        .field("names", "John")
+        .field("names", "Paul")
+        .attach("firstField", "package.json");
+    t.truthy(typeof res.body.files.firstField === "object", "the res.body.files.firstField should be an object");
+    t.deepEqual(res.body.files.firstField.name, "backage.json", "the file name should be transfered");
+    t.truthy(statSync(res.body.files.firstField.path), "the file state of firstField should be ok");
+    t.deepEqual(path.dirname(res.body.files.firstField.path),
+        path.resolve(__dirname, ".."), "should save the file to different dir based on ctx.path");
+    unlinkSync(res.body.files.firstField.path);
+});

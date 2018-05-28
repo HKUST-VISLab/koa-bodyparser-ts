@@ -35,7 +35,7 @@ export interface MultiPartOptions {
     bytesExpected?: number;
     maxFields?: number;
     maxFieldsSize?: number;
-    uploadDir?: string;
+    uploadDir?: string | { [path: string]: string };
     keepExtensions?: boolean;
     hash?: "sha1" | "md5";
     multiples?: boolean;
@@ -208,7 +208,13 @@ export default function bodyParser(opts: BodyParserOptions = {}) {
             return await parse.text(ctx, textOpts);
         }
         if (enableMultipart && ctx.is(multipartTypes)) {
-            return await formy(ctx, multipartOpts);
+            if (typeof multipartOptions.uploadDir === "string") {
+                return await formy(ctx, multipartOpts);
+            } else if (typeof multipartOptions.uploadDir === "object") {
+                const newOpts = { ...multipartOptions };
+                newOpts.uploadDir = multipartOptions.uploadDir[ctx.path];
+                return await formy(ctx, newOpts);
+            }
         }
         return {};
     }
