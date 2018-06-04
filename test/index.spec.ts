@@ -1,5 +1,7 @@
 import test from "ava";
+import { statSync, unlinkSync } from "fs";
 import * as Koa from "koa";
+import * as path from "path";
 import * as request from "supertest";
 import bodyparser, { BodyParserOptions } from "../src/index";
 
@@ -274,4 +276,139 @@ test("bodyparser#disableBodyParser", async (t) => {
         .set("content-type", "application/json");
     t.is(res.status, 200, "should get empty return");
     t.deepEqual(res.text, "empty", "should not parse body when disableBodyParser set to true");
+});
+
+test("bodyparser#multipart FIELDS", async (t) => {
+    const app = makeApp({ enableTypes: ["multipart"] });
+    app.use(async (ctx) => {
+        ctx.body = ctx.request.body;
+    });
+
+    const req = request(app.listen());
+    const res = await req.post("/")
+        .field("name", "daryl")
+        .field("followers", 30);
+    t.deepEqual(res.body.fields, { name: "daryl", followers: "30" },
+        "should receive `multipart` requests - fields on .body.fields object");
+});
+
+test("bodyparser#multipart FILES", async (t) => {
+    const app = makeApp({ enableTypes: ["multipart"], multipartOptions: { uploadDir: `${__dirname}` } });
+    app.use(async (ctx) => {
+        ctx.body = ctx.request.body;
+    });
+
+    const req = request(app.listen());
+    const res = await req.post("/")
+        .type("multipart/form-data")
+        .field("names", "John")
+        .field("names", "Paul")
+        .attach("firstField", "package.json")
+        .attach("secondField", "src/index.ts")
+        .attach("secondField", "package.json")
+        .attach("thirdField", "LICENSE")
+        .attach("thirdField", "README.md")
+        .attach("thirdField", "package.json");
+
+    t.deepEqual(res.body.fields, { names: ["John", "Paul"] },
+        "fileds.names should be an array with length 2 and content");
+    t.truthy(typeof res.body.files.firstField === "object", "res.body.files.firstField should be an object");
+    t.deepEqual(res.body.files.firstField.name, "package.json", "the firstField.name should be package.json");
+    t.truthy(statSync(res.body.files.firstField.path), "the file state of firstField should be ok");
+    unlinkSync(res.body.files.firstField.path);
+
+    t.truthy(Array.isArray(res.body.files.secondField) && res.body.files.secondField.length === 2,
+        "res.body.files.secondField should be an array of length 2");
+    t.truthy(res.body.files.secondField.map(d => d.name)
+        .every(d => ["package.json", "index.ts"].indexOf(d) !== -1),
+        "the name of files in files.secondField");
+    t.truthy(statSync(res.body.files.secondField[0].path), "the file state of secondField[0] should be ok");
+    t.truthy(statSync(res.body.files.secondField[1].path), "the file state of secondField[1] should be ok");
+    unlinkSync(res.body.files.secondField[0].path);
+    unlinkSync(res.body.files.secondField[1].path);
+
+    t.truthy(Array.isArray(res.body.files.thirdField) && res.body.files.thirdField.length === 3,
+        "res.body.files.thirdField should be an array of length 3");
+    t.truthy(res.body.files.thirdField.map(d => d.name)
+        .every(d => ["LICENSE", "README.md", "package.json"].indexOf(d) !== -1),
+        "the name of files in files.thirdField");
+    t.truthy(statSync(res.body.files.thirdField[0].path), "the file state of thirdField[0] should be ok");
+    t.truthy(statSync(res.body.files.thirdField[1].path), "the file state of thirdField[1] should be ok");
+    t.truthy(statSync(res.body.files.thirdField[2].path), "the file state of thirdField[2] should be ok");
+    unlinkSync(res.body.files.thirdField[0].path);
+    unlinkSync(res.body.files.thirdField[1].path);
+    unlinkSync(res.body.files.thirdField[2].path);
+});
+
+test("bodyparser#multipart transfer file names", async (t) => {
+    const app = makeApp({
+        enableTypes: ["multipart"],
+        multipartOptions: {
+            uploadDir: `${__dirname}`,
+            onFileBegin: (name, file) => {
+                file.name = "backage.json";
+                const folder = path.dirname(file.path);
+                file.path = path.join(folder, file.name);
+            },
+        },
+    });
+    app.use(async (ctx) => {
+        ctx.body = ctx.request.body;
+    });
+
+    const req = request(app.listen());
+    const res = await req.post("/")
+        .type("multipart/form-data")
+        .field("names", "John")
+        .field("names", "Paul")
+        .attach("firstField", "package.json");
+
+    t.truthy(typeof res.body.files.firstField === "object", "the res.body.files.firstField should be an object");
+    t.deepEqual(res.body.files.firstField.name, "backage.json", "the file name should be transfered");
+    t.truthy(statSync(res.body.files.firstField.path), "the file state of firstField should be ok");
+    unlinkSync(res.body.files.firstField.path);
+});
+
+test("bodyparser#multipart auto open box based on ctx.path if uploadPath is an object", async (t) => {
+    const app = makeApp({
+        enableTypes: ["multipart"],
+        multipartOptions: {
+            uploadDir: {
+                "/user": __dirname,
+                "/": path.resolve(__dirname, ".."),
+            },
+            onFileBegin: (name, file) => {
+                file.name = "cackage.json";
+                const folder = path.dirname(file.path);
+                file.path = path.join(folder, file.name);
+            },
+        },
+    });
+    app.use(async (ctx) => {
+        ctx.body = ctx.request.body;
+    });
+
+    const req = request(app.listen());
+    let res = await req.post("/user")
+        .type("multipart/form-data")
+        .field("names", "John")
+        .field("names", "Paul")
+        .attach("firstField", "package.json");
+
+    t.truthy(typeof res.body.files.firstField === "object", "the res.body.files.firstField should be an object");
+    t.deepEqual(res.body.files.firstField.name, "cackage.json", "the file name should be transfered");
+    t.truthy(statSync(res.body.files.firstField.path), "the file state of firstField should be ok");
+    unlinkSync(res.body.files.firstField.path);
+
+    res = await req.post("/")
+        .type("multipart/form-data")
+        .field("names", "John")
+        .field("names", "Paul")
+        .attach("firstField", "package.json");
+    t.truthy(typeof res.body.files.firstField === "object", "the res.body.files.firstField should be an object");
+    t.deepEqual(res.body.files.firstField.name, "cackage.json", "the file name should be transfered");
+    t.truthy(statSync(res.body.files.firstField.path), "the file state of firstField should be ok");
+    t.deepEqual(path.dirname(res.body.files.firstField.path),
+        path.resolve(__dirname, ".."), "should save the file to different dir based on ctx.path");
+    unlinkSync(res.body.files.firstField.path);
 });

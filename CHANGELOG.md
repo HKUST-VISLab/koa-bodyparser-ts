@@ -2,6 +2,66 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.1"></a>
+## [0.3.1](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.3.0...v0.3.1) (2018-05-28)
+
+
+### Bug Fixes
+
+* minor bugs ([265c4ac](https://github.com/HKUST-VISLab/koa-bodyparser-ts/commit/265c4ac))
+
+
+
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.2.4...v0.3.0) (2018-05-28)
+
+
+### Features
+
+* dynamic upload folder based on ctx.path ([c31c5b4](https://github.com/HKUST-VISLab/koa-bodyparser-ts/commit/c31c5b4))
+
+
+
+<a name="0.2.4"></a>
+## [0.2.4](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.2.3...v0.2.4) (2018-05-14)
+
+
+### Bug Fixes
+
+* type problem ([91b5387](https://github.com/HKUST-VISLab/koa-bodyparser-ts/commit/91b5387))
+
+
+
+<a name="0.2.3"></a>
+## [0.2.3](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.2.2...v0.2.3) (2018-05-13)
+
+
+
+<a name="0.2.2"></a>
+## [0.2.2](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.2.0...v0.2.2) (2018-05-13)
+
+
+
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.2.0...v0.2.1) (2018-05-13)
+
+
+
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.1.6...v0.2.0) (2018-05-12)
+
+
+### Bug Fixes
+
+* **package:** update [@types](https://github.com/types)/node to version 9.6.3 ([b156eae](https://github.com/HKUST-VISLab/koa-bodyparser-ts/commit/b156eae))
+
+
+### Features
+
+* support upload files ([1ddce10](https://github.com/HKUST-VISLab/koa-bodyparser-ts/commit/1ddce10))
+
+
+
 <a name="0.1.6"></a>
 ## [0.1.6](https://github.com/HKUST-VISLab/koa-bodyparser-ts/compare/v0.1.5...v0.1.6) (2018-04-10)
 

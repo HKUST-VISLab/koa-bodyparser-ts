@@ -1,6 +1,6 @@
 {
   "name": "koa-bodyparser-ts",
-  "version": "0.1.6",
+  "version": "0.3.1",
   "description": "a bodyparser for koa written in TypeScript.",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -32,13 +32,14 @@
   "dependencies": {
     "@types/koa": "^2.0.45",
     "@types/node": "^10.0.3",
-    "co-body": "^5.1.1"
+    "co-body": "^6.0.0",
+    "formidable": "^1.2.1"
   },
   "devDependencies": {
     "@types/supertest": "^2.0.4",
     "ava": "^0.25.0",
     "koa": "^2.5.0",
-    "nyc": "^11.6.0",
+    "nyc": "^12.0.1",
     "shelljs": "^0.8.1",
     "standard-version": "^4.3.0",
     "supertest": "^3.0.0",
